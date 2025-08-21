@@ -49,6 +49,7 @@
       color: white;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
 
     h1 {
@@ -144,6 +145,11 @@
       cursor: pointer;
       position: relative;
       font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .calendar-grid td:hover {
+      background-color: rgba(54, 209, 220, 0.1);
     }
 
     .calendar-grid td.has-task {
@@ -201,6 +207,7 @@
 
     .form-group {
       margin-bottom: 15px;
+      position: relative;
     }
 
     label {
@@ -218,6 +225,7 @@
       border-radius: var(--border-radius);
       font-size: 16px;
       background: white;
+      transition: all 0.3s;
     }
 
     input:focus, select:focus, textarea:focus {
@@ -292,6 +300,11 @@
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
       border-left: 4px solid var(--primary);
+      transition: transform 0.2s;
+    }
+
+    .task-item:hover {
+      transform: translateX(5px);
     }
 
     .task-content {
@@ -420,6 +433,110 @@
       border-radius: 50%;
     }
 
+    .notification-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 1001;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .notification-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .notification-toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification-toast.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    .notification-toast.warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    .form-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .input-error {
+      border-color: var(--danger) !important;
+    }
+
+    .calendar-grid td.overdue {
+      background: linear-gradient(135deg, #ff6b6b, #ff5252);
+      color: white;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+
+    .urgent-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      animation: pulse 1.5s infinite;
+    }
+
+    .financial-summary {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin: 20px 0;
+    }
+
+    .financial-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .financial-label {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    .financial-value {
+      font-weight: 700;
+    }
+
+    .financial-total {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid var(--primary);
+      font-size: 1.2rem;
+    }
+
     @media (max-width: 768px) {
       .calendar-grid th, 
       .calendar-grid td {
@@ -439,6 +556,12 @@
       
       .btn-small {
         width: 100%;
+      }
+
+      .notification-toast {
+        left: 20px;
+        right: 20px;
+        bottom: 70px;
       }
     }
 
@@ -475,19 +598,68 @@
       margin: 20px 0;
       font-size: 0.9rem;
     }
+    
+    .payment-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+      font-size: 0.85rem;
+    }
+    
+    .payment-badge {
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .payment-pending {
+      background-color: #ffebee;
+      color: #f44336;
+    }
+    
+    .payment-partial {
+      background-color: #fff8e1;
+      color: #ffa000;
+    }
+    
+    .payment-complete {
+      background-color: #e8f5e9;
+      color: #4caf50;
+    }
+    
+    .order-details {
+      margin: 10px 0;
+      padding: 10px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-left: 3px solid var(--primary);
+    }
+    
+    .order-detail-item {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .order-detail-label {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    .cancel-edit-btn {
+      display: none;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1><i class="fas fa-scissors"></i> Yulissa Crochet</h1>
+      <h1><i class="fas fa-yarn"></i> Yulissa Crochet</h1>
       <p>Gestor de encargos y pedidos</p>
     </header>
-
-    <div class="deploy-info">
-      <h3><i class="fas fa-cloud-upload-alt"></i> ¡Aplicación desplegada correctamente!</h3>
-      <p>Esta aplicación está funcionando en GitHub Pages. Todos tus datos se guardan localmente en tu navegador.</p>
-    </div>
 
     <div class="app-container">
       <!-- Sección del Calendario -->
@@ -529,6 +701,27 @@
             <span class="stat-label">Pendientes</span>
           </div>
         </div>
+
+        <!-- Resumen Financiero -->
+        <h3 class="section-title"><i class="fas fa-coins"></i> Resumen Financiero</h3>
+        <div class="financial-summary" id="financialSummary">
+          <div class="financial-item">
+            <span class="financial-label">Pendientes de pago:</span>
+            <span class="financial-value" id="pendingPayment">$0</span>
+          </div>
+          <div class="financial-item">
+            <span class="financial-label">Pagados parcialmente:</span>
+            <span class="financial-value" id="partialPayment">$0</span>
+          </div>
+          <div class="financial-item">
+            <span class="financial-label">Total recibido:</span>
+            <span class="financial-value" id="completePayment">$0</span>
+          </div>
+          <div class="financial-item financial-total">
+            <span class="financial-label">Total esperado:</span>
+            <span class="financial-value" id="totalExpected">$0</span>
+          </div>
+        </div>
       </div>
 
       <!-- Sección del Formulario y Lista -->
@@ -539,16 +732,24 @@
           <div class="form-group">
             <label for="clientName">Nombre del cliente</label>
             <input type="text" id="clientName" placeholder="Ej: María García" required>
+            <div class="form-error" id="clientNameError">Por favor ingresa un nombre válido</div>
           </div>
           
           <div class="form-group">
             <label for="taskDescription">Descripción del encargo</label>
             <textarea id="taskDescription" rows="3" placeholder="Ej: Bolso gris con asas largas y detalles en blanco"></textarea>
+            <div class="form-error" id="taskDescriptionError">Por favor ingresa una descripción</div>
           </div>
           
           <div class="form-group">
             <label for="dueDate">Fecha de entrega</label>
             <input type="date" id="dueDate" required>
+            <div class="form-error" id="dueDateError">Por favor selecciona una fecha válida</div>
+          </div>
+
+          <div class="form-group">
+            <label for="orderValue">Valor del pedido ($)</label>
+            <input type="number" id="orderValue" placeholder="Ej: 25000" min="0" step="1000">
           </div>
           
           <div class="form-group">
@@ -559,9 +760,22 @@
               <option value="high">🔴 Alta</option>
             </select>
           </div>
+          
+          <div class="form-group">
+            <label for="paymentStatus">Estado de pago</label>
+            <select id="paymentStatus">
+              <option value="pending">⏰ Pendiente</option>
+              <option value="partial">💰 50% Pagado</option>
+              <option value="complete">✅ 100% Pagado</option>
+            </select>
+          </div>
 
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> Guardar Encargo
+          </button>
+
+          <button type="button" id="cancelEditBtn" class="btn btn-secondary cancel-edit-btn">
+            <i class="fas fa-times"></i> Cancelar Edición
           </button>
         </form>
         
@@ -569,6 +783,7 @@
           <button class="filter-btn active" data-filter="all">Todos</button>
           <button class="filter-btn" data-filter="high">Alta</button>
           <button class="filter-btn" data-filter="pending">Pendientes</button>
+          <button class="filter-btn" data-filter="overdue">Vencidos</button>
         </div>
         
         <h3 class="section-title"><i class="fas fa-list"></i> Lista de Encargos</h3>
@@ -588,6 +803,9 @@
           <button id="statsBtn" class="btn btn-secondary">
             <i class="fas fa-chart-pie"></i> Ver Estadísticas
           </button>
+          <button id="clearAllBtn" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Limpiar Todo
+          </button>
         </div>
       </div>
     </div>
@@ -604,6 +822,23 @@
     </div>
   </div>
 
+  <!-- Modal de Detalles del Día -->
+  <div id="dayDetailsModal" class="modal">
+    <div class="modal-content">
+      <button class="close" id="closeDayDetails">&times;</button>
+      <h2><i class="fas fa-calendar-day"></i> Encargos del <span id="modalDate"></span></h2>
+      <div id="dayOrdersContent">
+        <!-- El contenido de los encargos del día se generará aquí -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificación Toast -->
+  <div class="notification-toast" id="notification">
+    <i class="fas fa-bell"></i>
+    <span id="notification-message"></span>
+  </div>
+
   <script>
     // Variables globales
     let orders = [];
@@ -616,8 +851,10 @@
       loadOrders();
       renderCalendar();
       updateStats();
+      updateFinancialSummary();
       renderOrderList();
       setupEventListeners();
+      checkOverdueOrders();
       
       // Establecer fecha mínima como hoy
       const today = new Date().toISOString().split('T')[0];
@@ -638,7 +875,9 @@
       localStorage.setItem('yulissa_orders', JSON.stringify(orders));
       renderCalendar();
       updateStats();
+      updateFinancialSummary();
       renderOrderList();
+      checkOverdueOrders();
     }
 
     // Configurar event listeners
@@ -657,8 +896,13 @@
       // Formulario
       document.getElementById('taskForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        saveOrder();
+        if (validateForm()) {
+          saveOrder();
+        }
       });
+
+      // Cancelar edición
+      document.getElementById('cancelEditBtn').addEventListener('click', cancelEdit);
       
       // Filtros
       document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -676,8 +920,23 @@
       // Botones de exportación y estadísticas
       document.getElementById('exportBtn').addEventListener('click', exportToPDF);
       document.getElementById('statsBtn').addEventListener('click', showStats);
+      document.getElementById('clearAllBtn').addEventListener('click', clearAllOrders);
       document.getElementById('closeStats').addEventListener('click', () => {
         document.getElementById('statsModal').style.display = 'none';
+      });
+      
+      // Validación en tiempo real
+      document.getElementById('clientName').addEventListener('blur', function() {
+        validateField(this, 'clientNameError', this.value.trim() !== '');
+      });
+      
+      document.getElementById('taskDescription').addEventListener('blur', function() {
+        validateField(this, 'taskDescriptionError', this.value.trim() !== '');
+      });
+      
+      document.getElementById('dueDate').addEventListener('change', function() {
+        const today = new Date().toISOString().split('T')[0];
+        validateField(this, 'dueDateError', this.value >= today);
       });
       
       // Cerrar modal al hacer clic fuera
@@ -685,7 +944,71 @@
         if (e.target === document.getElementById('statsModal')) {
           document.getElementById('statsModal').style.display = 'none';
         }
+        if (e.target === document.getElementById('dayDetailsModal')) {
+          document.getElementById('dayDetailsModal').style.display = 'none';
+        }
       });
+      
+      // Cerrar modal de detalles del día
+      document.getElementById('closeDayDetails').addEventListener('click', () => {
+        document.getElementById('dayDetailsModal').style.display = 'none';
+      });
+    }
+
+    // Validar formulario
+    function validateForm() {
+      let isValid = true;
+      const clientName = document.getElementById('clientName').value.trim();
+      const taskDescription = document.getElementById('taskDescription').value.trim();
+      const dueDate = document.getElementById('dueDate').value;
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Validar nombre del cliente
+      if (clientName === '') {
+        showError(document.getElementById('clientName'), 'clientNameError');
+        isValid = false;
+      } else {
+        hideError(document.getElementById('clientName'), 'clientNameError');
+      }
+      
+      // Validar descripción
+      if (taskDescription === '') {
+        showError(document.getElementById('taskDescription'), 'taskDescriptionError');
+        isValid = false;
+      } else {
+        hideError(document.getElementById('taskDescription'), 'taskDescriptionError');
+      }
+      
+      // Validar fecha
+      if (dueDate < today) {
+        showError(document.getElementById('dueDate'), 'dueDateError');
+        isValid = false;
+      } else {
+        hideError(document.getElementById('dueDate'), 'dueDateError');
+      }
+      
+      return isValid;
+    }
+
+    // Mostrar error en campo
+    function showError(field, errorId) {
+      field.classList.add('input-error');
+      document.getElementById(errorId).style.display = 'block';
+    }
+
+    // Ocultar error en campo
+    function hideError(field, errorId) {
+      field.classList.remove('input-error');
+      document.getElementById(errorId).style.display = 'none';
+    }
+
+    // Validar campo individual
+    function validateField(field, errorId, condition) {
+      if (condition) {
+        hideError(field, errorId);
+      } else {
+        showError(field, errorId);
+      }
     }
 
     // Renderizar calendario
@@ -753,12 +1076,30 @@
                 cell.classList.add('priority-low');
               }
               
+              // Comprobar si hay órdenes vencidas
+              const today = new Date().toISOString().split('T')[0];
+              if (dateString < today) {
+                cell.classList.add('overdue');
+              }
+              
+              // Añadir badge con cantidad si hay más de una orden
+              if (dayOrders.length > 1) {
+                const countBadge = document.createElement('span');
+                countBadge.className = 'urgent-badge';
+                countBadge.textContent = dayOrders.length;
+                cell.appendChild(countBadge);
+              }
+              
               // Añadir tooltip con información de órdenes
               cell.title = `${dayOrders.length} encargo(s) este día`;
               
-              // Añadir evento para arrastrar y soltar
-              cell.addEventListener('dragover', allowDrop);
-              cell.addEventListener('drop', (e) => dropOrder(e, dateString));
+              // Hacer la celda clickeable para mostrar detalles
+              cell.setAttribute('data-date', dateString);
+              cell.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('urgent-badge')) {
+                  showDayDetails(dateString);
+                }
+              });
             }
             
             date++;
@@ -775,33 +1116,110 @@
       }
     }
 
+    // Mostrar detalles de los encargos de un día
+    function showDayDetails(dateString) {
+      const dayOrders = orders.filter(order => order.dueDate === dateString);
+      const modalDate = document.getElementById('modalDate');
+      const dayOrdersContent = document.getElementById('dayOrdersContent');
+      
+      // Formatear la fecha para mostrar
+      const dateObj = new Date(dateString);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      modalDate.textContent = dateObj.toLocaleDateString('es-ES', options);
+      
+      // Limpiar y llenar el contenido
+      dayOrdersContent.innerHTML = '';
+      
+      if (dayOrders.length === 0) {
+        dayOrdersContent.innerHTML = '<p>No hay encargos para este día.</p>';
+      } else {
+        dayOrders.forEach((order, index) => {
+          const orderElement = document.createElement('div');
+          orderElement.className = 'order-details';
+          
+          orderElement.innerHTML = `
+            <div class="order-detail-item">
+              <span class="order-detail-label">Cliente:</span>
+              <span>${escapeHtml(order.clientName)}</span>
+            </div>
+            <div class="order-detail-item">
+              <span class="order-detail-label">Encargo:</span>
+              <span>${escapeHtml(order.taskDescription)}</span>
+            </div>
+            ${order.orderValue ? `
+            <div class="order-detail-item">
+              <span class="order-detail-label">Valor:</span>
+              <span>$${formatCurrency(order.orderValue)}</span>
+            </div>
+            ` : ''}
+            <div class="order-detail-item">
+              <span class="order-detail-label">Prioridad:</span>
+              <span>${order.priority === 'high' ? '🔴 Alta' : order.priority === 'medium' ? '🟡 Media' : '🟢 Baja'}</span>
+            </div>
+            <div class="order-detail-item">
+              <span class="order-detail-label">Pago:</span>
+              <span class="payment-badge ${getPaymentBadgeClass(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span>
+            </div>
+          `;
+          
+          dayOrdersContent.appendChild(orderElement);
+        });
+      }
+      
+      // Mostrar el modal
+      document.getElementById('dayDetailsModal').style.display = 'flex';
+    }
+
+    // Obtener clase CSS para el badge de pago
+    function getPaymentBadgeClass(paymentStatus) {
+      switch(paymentStatus) {
+        case 'pending': return 'payment-pending';
+        case 'partial': return 'payment-partial';
+        case 'complete': return 'payment-complete';
+        default: return '';
+      }
+    }
+
+    // Obtener texto para el estado de pago
+    function getPaymentStatusText(paymentStatus) {
+      switch(paymentStatus) {
+        case 'pending': return 'Pendiente';
+        case 'partial': return '50% Pagado';
+        case 'complete': return '100% Pagado';
+        default: return '';
+      }
+    }
+
     // Guardar una nueva orden o editar existente
     function saveOrder() {
       const clientName = document.getElementById('clientName').value.trim();
       const taskDescription = document.getElementById('taskDescription').value.trim();
       const dueDate = document.getElementById('dueDate').value;
       const priority = document.getElementById('priority').value;
-      
-      if (!clientName || !dueDate) {
-        alert('Por favor, complete todos los campos obligatorios.');
-        return;
-      }
+      const paymentStatus = document.getElementById('paymentStatus').value;
+      const orderValue = document.getElementById('orderValue').value ? parseInt(document.getElementById('orderValue').value) : 0;
       
       const newOrder = {
         clientName,
         taskDescription,
         dueDate,
         priority,
-        createdAt: new Date().toISOString()
+        paymentStatus,
+        orderValue,
+        createdAt: editingIndex === -1 ? new Date().toISOString() : orders[editingIndex].createdAt,
+        updatedAt: new Date().toISOString()
       };
       
       if (editingIndex === -1) {
         // Nueva orden
         orders.push(newOrder);
+        showNotification('Encargo guardado correctamente', 'success');
       } else {
         // Editar orden existente
         orders[editingIndex] = newOrder;
         editingIndex = -1;
+        document.getElementById('cancelEditBtn').style.display = 'none';
+        showNotification('Encargo actualizado correctamente', 'success');
       }
       
       saveOrders();
@@ -812,10 +1230,24 @@
       document.getElementById('dueDate').value = today;
     }
 
+    // Cancelar edición
+    function cancelEdit() {
+      editingIndex = -1;
+      document.getElementById('taskForm').reset();
+      document.getElementById('cancelEditBtn').style.display = 'none';
+      
+      // Restablecer la fecha a hoy
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('dueDate').value = today;
+      
+      showNotification('Edición cancelada', 'warning');
+    }
+
     // Renderizar lista de órdenes
     function renderOrderList() {
       const taskList = document.getElementById('taskList');
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const today = new Date().toISOString().split('T')[0];
       
       // Filtrar órdenes según criterios
       let filteredOrders = orders;
@@ -824,8 +1256,9 @@
       if (currentFilter === 'high') {
         filteredOrders = filteredOrders.filter(order => order.priority === 'high');
       } else if (currentFilter === 'pending') {
-        const today = new Date().toISOString().split('T')[0];
         filteredOrders = filteredOrders.filter(order => order.dueDate < today);
+      } else if (currentFilter === 'overdue') {
+        filteredOrders = filteredOrders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete');
       }
       
       // Aplicar búsqueda
@@ -835,6 +1268,9 @@
           order.taskDescription.toLowerCase().includes(searchTerm)
         );
       }
+      
+      // Ordenar por fecha de entrega (más cercana primero)
+      filteredOrders.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
       
       // Limpiar lista
       taskList.innerHTML = '';
@@ -853,14 +1289,23 @@
       filteredOrders.forEach((order, index) => {
         const orderElement = document.createElement('div');
         orderElement.className = 'task-item';
-        orderElement.draggable = true;
+        if (order.dueDate < today && order.paymentStatus !== 'complete') {
+          orderElement.style.borderLeftColor = 'var(--danger)';
+        }
+        
         orderElement.setAttribute('data-index', orders.indexOf(order));
         
         orderElement.innerHTML = `
           <div class="task-content">
             <div class="task-text"><strong>${escapeHtml(order.clientName)}</strong>: ${escapeHtml(order.taskDescription)}</div>
+            ${order.orderValue ? `<div class="task-date">Valor: $${formatCurrency(order.orderValue)}</div>` : ''}
             <div class="task-date">Entrega: ${formatDisplayDate(order.dueDate)} - 
               ${order.priority === 'high' ? '🔴 Alta' : order.priority === 'medium' ? '🟡 Media' : '🟢 Baja'} Prioridad
+              ${order.dueDate < today ? ' - ⚠️ Vencido' : ''}
+            </div>
+            <div class="payment-status">
+              <span>Pago:</span>
+              <span class="payment-badge ${getPaymentBadgeClass(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span>
             </div>
           </div>
           <div class="task-actions">
@@ -872,9 +1317,6 @@
             </button>
           </div>
         `;
-        
-        // Añadir eventos para arrastrar y soltar
-        orderElement.addEventListener('dragstart', dragOrder);
         
         // Añadir eventos para editar y eliminar
         orderElement.querySelector('.edit-btn').addEventListener('click', () => editOrder(orders.indexOf(order)));
@@ -890,12 +1332,17 @@
       document.getElementById('clientName').value = order.clientName;
       document.getElementById('taskDescription').value = order.taskDescription;
       document.getElementById('dueDate').value = order.dueDate;
+      document.getElementById('orderValue').value = order.orderValue;
       document.getElementById('priority').value = order.priority;
+      document.getElementById('paymentStatus').value = order.paymentStatus;
       
       editingIndex = index;
+      document.getElementById('cancelEditBtn').style.display = 'block';
       
       // Scroll al formulario
       document.getElementById('taskForm').scrollIntoView({ behavior: 'smooth' });
+      
+      showNotification('Editando encargo', 'warning');
     }
 
     // Eliminar orden
@@ -903,31 +1350,16 @@
       if (confirm('¿Estás seguro de que deseas eliminar este encargo?')) {
         orders.splice(index, 1);
         saveOrders();
+        showNotification('Encargo eliminado', 'error');
       }
     }
 
-    // Funciones para arrastrar y soltar
-    function allowDrop(e) {
-      e.preventDefault();
-    }
-
-    function dragOrder(e) {
-      e.dataTransfer.setData("text/plain", e.target.getAttribute('data-index'));
-    }
-
-    function dropOrder(e, dateString) {
-      e.preventDefault();
-      const orderIndex = e.dataTransfer.getData("text/plain");
-      
-      if (orderIndex) {
-        orders[orderIndex].dueDate = dateString;
+    // Limpiar todas las órdenes
+    function clearAllOrders() {
+      if (confirm('¿Estás seguro de que deseas eliminar TODOS los encargos? Esta acción no se puede deshacer.')) {
+        orders = [];
         saveOrders();
-        
-        // Efecto visual de confirmación
-        e.target.classList.add('priority-medium');
-        setTimeout(() => {
-          e.target.classList.remove('priority-medium');
-        }, 1000);
+        showNotification('Todos los encargos han sido eliminados', 'error');
       }
     }
 
@@ -944,6 +1376,34 @@
       document.getElementById('pendingTasks').querySelector('.stat-number').textContent = pending;
     }
 
+    // Actualizar resumen financiero
+    function updateFinancialSummary() {
+      let pendingPayment = 0;
+      let partialPayment = 0;
+      let completePayment = 0;
+      let totalExpected = 0;
+      
+      orders.forEach(order => {
+        if (order.orderValue) {
+          totalExpected += order.orderValue;
+          
+          if (order.paymentStatus === 'pending') {
+            pendingPayment += order.orderValue;
+          } else if (order.paymentStatus === 'partial') {
+            partialPayment += order.orderValue * 0.5;
+            pendingPayment += order.orderValue * 0.5;
+          } else if (order.paymentStatus === 'complete') {
+            completePayment += order.orderValue;
+          }
+        }
+      });
+      
+      document.getElementById('pendingPayment').textContent = `$${formatCurrency(pendingPayment)}`;
+      document.getElementById('partialPayment').textContent = `$${formatCurrency(partialPayment)}`;
+      document.getElementById('completePayment').textContent = `$${formatCurrency(completePayment)}`;
+      document.getElementById('totalExpected').textContent = `$${formatCurrency(totalExpected)}`;
+    }
+
     // Mostrar estadísticas en modal
     function showStats() {
       const statsContent = document.getElementById('statsContent');
@@ -953,8 +1413,14 @@
       const lowPriority = orders.filter(order => order.priority === 'low').length;
       
       const today = new Date().toISOString().split('T')[0];
+      const overdue = orders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete').length;
       const pending = orders.filter(order => order.dueDate < today).length;
       const completed = orders.filter(order => order.dueDate >= today).length;
+      
+      // Estadísticas de pago
+      const paymentPending = orders.filter(order => order.paymentStatus === 'pending').length;
+      const paymentPartial = orders.filter(order => order.paymentStatus === 'partial').length;
+      const paymentComplete = orders.filter(order => order.paymentStatus === 'complete').length;
       
       statsContent.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 20px 0;">
@@ -962,6 +1428,7 @@
             <h3 style="color: var(--secondary); margin-bottom: 10px;">Resumen General</h3>
             <p>Total de encargos: <strong>${total}</strong></p>
             <p>Encargos pendientes: <strong>${pending}</strong></p>
+            <p>Encargos vencidos: <strong>${overdue}</strong></p>
             <p>Encargos en tiempo: <strong>${completed}</strong></p>
           </div>
           
@@ -970,6 +1437,13 @@
             <p>🔴 Alta prioridad: <strong>${highPriority}</strong></p>
             <p>🟡 Media prioridad: <strong>${mediumPriority}</strong></p>
             <p>🟢 Baja prioridad: <strong>${lowPriority}</strong></p>
+          </div>
+          
+          <div style="background: #f0f7ff; padding: 15px; border-radius: 12px;">
+            <h3 style="color: var(--secondary); margin-bottom: 10px;">Estado de Pagos</h3>
+            <p>⏰ Pendientes: <strong>${paymentPending}</strong></p>
+            <p>💰 50% Pagado: <strong>${paymentPartial}</strong></p>
+            <p>✅ 100% Pagado: <strong>${paymentComplete}</strong></p>
           </div>
         </div>
         
@@ -1002,7 +1476,7 @@
         html += `
           <div style="padding: 10px; border-bottom: 1px solid #eee;">
             <strong>${escapeHtml(order.clientName)}</strong> - ${escapeHtml(order.taskDescription)}<br>
-            <span style="font-size: 0.9em; color: #666;">Vence: ${formatDisplayDate(order.dueDate)}</span>
+            <span style="font-size: 0.9em; color: #666;">Vence: ${formatDisplayDate(order.dueDate)} | Pago: ${getPaymentStatusText(order.paymentStatus)}</span>
           </div>
         `;
       });
@@ -1043,16 +1517,47 @@
         const description = doc.splitTextToSize(order.taskDescription, 160);
         doc.text(description, 25, y + 7);
         
-        // Fecha y prioridad
+        // Fecha, prioridad y estado de pago
         doc.setFontSize(10);
-        doc.text(`Fecha de entrega: ${formatDisplayDate(order.dueDate)} | Prioridad: ${getPriorityText(order.priority)}`, 15, y + 7 + (description.length * 5));
+        let detailsY = y + 7 + (description.length * 5);
+        doc.text(`Fecha de entrega: ${formatDisplayDate(order.dueDate)} | Prioridad: ${getPriorityText(order.priority)} | Pago: ${getPaymentStatusText(order.paymentStatus)}`, 15, detailsY);
+        
+        // Valor si existe
+        if (order.orderValue) {
+          doc.text(`Valor: $${formatCurrency(order.orderValue)}`, 15, detailsY + 5);
+          detailsY += 5;
+        }
         
         // Aumentar Y según la cantidad de líneas de descripción
-        y += 15 + (description.length * 5);
+        y += 15 + (description.length * 5) + (order.orderValue ? 5 : 0);
       });
       
       // Guardar PDF
       doc.save(`encargos-yulissa-${new Date().toISOString().split('T')[0]}.pdf`);
+      showNotification('PDF exportado correctamente', 'success');
+    }
+
+    // Mostrar notificación
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const notificationMessage = document.getElementById('notification-message');
+      
+      notificationMessage.textContent = message;
+      notification.className = `notification-toast ${type} show`;
+      
+      setTimeout(() => {
+        notification.className = 'notification-toast';
+      }, 3000);
+    }
+
+    // Comprobar órdenes vencidas
+    function checkOverdueOrders() {
+      const today = new Date().toISOString().split('T')[0];
+      const overdueOrders = orders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete');
+      
+      if (overdueOrders.length > 0) {
+        showNotification(`Tienes ${overdueOrders.length} encargo(s) vencido(s)`, 'error');
+      }
     }
 
     // Funciones de utilidad para formato
@@ -1063,6 +1568,10 @@
     function formatDisplayDate(dateString) {
       const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
       return new Date(dateString).toLocaleDateString('es-ES', options);
+    }
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('es-CO').format(amount);
     }
 
     function getPriorityText(priority) {
