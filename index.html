@@ -73,6 +73,11 @@
       
       .calendar-section {
         border-right: 1px solid #eaeaea;
+        width: 40%;
+      }
+      
+      .form-section {
+        width: 60%;
       }
     }
 
@@ -243,7 +248,6 @@
     }
 
     .btn {
-      width: 100%;
       padding: 14px 20px;
       border: none;
       border-radius: var(--border-radius);
@@ -256,6 +260,10 @@
       justify-content: center;
       gap: 8px;
       transition: all 0.2s;
+    }
+
+    .btn-full {
+      width: 100%;
     }
 
     .btn:hover {
@@ -281,6 +289,11 @@
 
     .btn-danger {
       background: linear-gradient(45deg, #ff6b6b, var(--danger));
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(45deg, #4caf50, #2e7d32);
       color: white;
     }
 
@@ -401,18 +414,6 @@
       color: #999;
       background: none;
       border: none;
-    }
-
-    .day-task {
-      font-size: 0.65rem;
-      background: rgba(0,0,0,0.2);
-      border-radius: 4px;
-      padding: 2px 4px;
-      margin-top: 4px;
-      display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .today {
@@ -537,6 +538,41 @@
       font-size: 1.2rem;
     }
 
+    .payment-section {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      margin: 15px 0;
+    }
+
+    .payment-progress {
+      height: 10px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    .payment-progress-bar {
+      height: 100%;
+      background: var(--success);
+      border-radius: 5px;
+      transition: width 0.3s;
+    }
+
+    .payment-details {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 0.9rem;
+    }
+
+    .payment-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
     @media (max-width: 768px) {
       .calendar-grid th, 
       .calendar-grid td {
@@ -556,6 +592,10 @@
       
       .btn-small {
         width: 100%;
+      }
+
+      .payment-actions {
+        flex-direction: column;
       }
 
       .notification-toast {
@@ -589,14 +629,6 @@
 
     #searchInput {
       margin-bottom: 15px;
-    }
-    
-    .deploy-info {
-      background: #f8f9fa;
-      border-radius: var(--border-radius);
-      padding: 15px;
-      margin: 20px 0;
-      font-size: 0.9rem;
     }
     
     .payment-status {
@@ -652,6 +684,17 @@
       display: none;
       margin-top: 10px;
     }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-group .btn {
+      flex: 1;
+      min-width: 120px;
+    }
   </style>
 </head>
 <body>
@@ -706,20 +749,20 @@
         <h3 class="section-title"><i class="fas fa-coins"></i> Resumen Financiero</h3>
         <div class="financial-summary" id="financialSummary">
           <div class="financial-item">
-            <span class="financial-label">Pendientes de pago:</span>
-            <span class="financial-value" id="pendingPayment">$0</span>
-          </div>
-          <div class="financial-item">
-            <span class="financial-label">Pagados parcialmente:</span>
-            <span class="financial-value" id="partialPayment">$0</span>
+            <span class="financial-label">Total esperado:</span>
+            <span class="financial-value" id="totalExpected">$0</span>
           </div>
           <div class="financial-item">
             <span class="financial-label">Total recibido:</span>
-            <span class="financial-value" id="completePayment">$0</span>
+            <span class="financial-value" id="totalReceived">$0</span>
+          </div>
+          <div class="financial-item">
+            <span class="financial-label">Pendiente por cobrar:</span>
+            <span class="financial-value" id="totalPending">$0</span>
           </div>
           <div class="financial-item financial-total">
-            <span class="financial-label">Total esperado:</span>
-            <span class="financial-value" id="totalExpected">$0</span>
+            <span class="financial-label">Porcentaje cobrado:</span>
+            <span class="financial-value" id="percentageReceived">0%</span>
           </div>
         </div>
       </div>
@@ -748,8 +791,9 @@
           </div>
 
           <div class="form-group">
-            <label for="orderValue">Valor del pedido ($)</label>
-            <input type="number" id="orderValue" placeholder="Ej: 25000" min="0" step="1000">
+            <label for="orderValue">Valor total del pedido ($)</label>
+            <input type="number" id="orderValue" placeholder="Ej: 25000" min="0" step="1000" required>
+            <div class="form-error" id="orderValueError">Por favor ingresa un valor válido</div>
           </div>
           
           <div class="form-group">
@@ -760,21 +804,40 @@
               <option value="high">🔴 Alta</option>
             </select>
           </div>
-          
-          <div class="form-group">
-            <label for="paymentStatus">Estado de pago</label>
-            <select id="paymentStatus">
-              <option value="pending">⏰ Pendiente</option>
-              <option value="partial">💰 50% Pagado</option>
-              <option value="complete">✅ 100% Pagado</option>
-            </select>
+
+          <div class="payment-section">
+            <h4><i class="fas fa-money-bill-wave"></i> Control de Pagos</h4>
+            
+            <div class="form-group">
+              <label for="amountPaid">Monto pagado hasta el momento ($)</label>
+              <input type="number" id="amountPaid" placeholder="Ej: 10000" min="0" step="1000" value="0">
+              <div class="form-error" id="amountPaidError">El monto pagado no puede ser mayor al valor total</div>
+            </div>
+            
+            <div class="payment-progress">
+              <div class="payment-progress-bar" id="paymentProgressBar" style="width: 0%"></div>
+            </div>
+            
+            <div class="payment-details">
+              <span id="paymentPercentage">0%</span>
+              <span id="paymentBalance">Saldo: $0</span>
+            </div>
+            
+            <div class="payment-actions">
+              <button type="button" class="btn btn-success btn-small" id="markPaidBtn">
+                <i class="fas fa-check"></i> Marcar como Pagado
+              </button>
+              <button type="button" class="btn btn-secondary btn-small" id="addPaymentBtn">
+                <i class="fas fa-plus"></i> Agregar Pago
+              </button>
+            </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary btn-full">
             <i class="fas fa-save"></i> Guardar Encargo
           </button>
 
-          <button type="button" id="cancelEditBtn" class="btn btn-secondary cancel-edit-btn">
+          <button type="button" id="cancelEditBtn" class="btn btn-secondary btn-full cancel-edit-btn">
             <i class="fas fa-times"></i> Cancelar Edición
           </button>
         </form>
@@ -784,6 +847,7 @@
           <button class="filter-btn" data-filter="high">Alta</button>
           <button class="filter-btn" data-filter="pending">Pendientes</button>
           <button class="filter-btn" data-filter="overdue">Vencidos</button>
+          <button class="filter-btn" data-filter="unpaid">Por Pagar</button>
         </div>
         
         <h3 class="section-title"><i class="fas fa-list"></i> Lista de Encargos</h3>
@@ -798,13 +862,13 @@
         
         <div class="btn-group">
           <button id="exportBtn" class="btn btn-warning">
-            <i class="fas fa-file-pdf"></i> Exportar a PDF
+            <i class="fas fa-file-pdf"></i> Exportar
           </button>
           <button id="statsBtn" class="btn btn-secondary">
-            <i class="fas fa-chart-pie"></i> Ver Estadísticas
+            <i class="fas fa-chart-pie"></i> Estadísticas
           </button>
           <button id="clearAllBtn" class="btn btn-danger">
-            <i class="fas fa-trash"></i> Limpiar Todo
+            <i class="fas fa-trash"></i> Limpiar
           </button>
         </div>
       </div>
@@ -833,6 +897,22 @@
     </div>
   </div>
 
+  <!-- Modal de Agregar Pago -->
+  <div id="addPaymentModal" class="modal">
+    <div class="modal-content">
+      <button class="close" id="closeAddPayment">&times;</button>
+      <h2><i class="fas fa-money-bill-wave"></i> Agregar Pago</h2>
+      <div class="form-group">
+        <label for="paymentAmount">Monto del pago ($)</label>
+        <input type="number" id="paymentAmount" placeholder="Ej: 5000" min="0" step="1000">
+        <div class="form-error" id="paymentAmountError">Por favor ingresa un monto válido</div>
+      </div>
+      <button id="confirmPaymentBtn" class="btn btn-success btn-full">
+        <i class="fas fa-check"></i> Confirmar Pago
+      </button>
+    </div>
+  </div>
+
   <!-- Notificación Toast -->
   <div class="notification-toast" id="notification">
     <i class="fas fa-bell"></i>
@@ -845,6 +925,7 @@
     let currentDate = new Date();
     let currentFilter = 'all';
     let editingIndex = -1;
+    let currentPaymentOrderIndex = -1;
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
@@ -855,12 +936,119 @@
       renderOrderList();
       setupEventListeners();
       checkOverdueOrders();
+      setupPaymentListeners();
       
       // Establecer fecha mínima como hoy
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dueDate').min = today;
       document.getElementById('dueDate').value = today;
+      
+      // Actualizar barra de progreso de pago
+      updatePaymentProgress();
     });
+
+    // Configurar listeners para el sistema de pagos
+    function setupPaymentListeners() {
+      // Actualizar barra de progreso cuando cambien los valores
+      document.getElementById('orderValue').addEventListener('input', updatePaymentProgress);
+      document.getElementById('amountPaid').addEventListener('input', updatePaymentProgress);
+      
+      // Validar que el monto pagado no sea mayor al valor total
+      document.getElementById('amountPaid').addEventListener('blur', function() {
+        const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+        const amountPaid = parseFloat(this.value) || 0;
+        
+        if (amountPaid > orderValue) {
+          showError(this, 'amountPaidError', 'El monto pagado no puede ser mayor al valor total');
+          this.value = orderValue;
+          updatePaymentProgress();
+        } else {
+          hideError(this, 'amountPaidError');
+        }
+      });
+      
+      // Botón para marcar como completamente pagado
+      document.getElementById('markPaidBtn').addEventListener('click', function() {
+        const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+        document.getElementById('amountPaid').value = orderValue;
+        updatePaymentProgress();
+        showNotification('Pedido marcado como completamente pagado', 'success');
+      });
+      
+      // Botón para agregar pago
+      document.getElementById('addPaymentBtn').addEventListener('click', function() {
+        const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+        const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+        const balance = orderValue - amountPaid;
+        
+        if (balance <= 0) {
+          showNotification('El pedido ya está completamente pagado', 'warning');
+          return;
+        }
+        
+        document.getElementById('paymentAmount').value = '';
+        document.getElementById('paymentAmount').max = balance;
+        document.getElementById('addPaymentModal').style.display = 'flex';
+      });
+      
+      // Cerrar modal de agregar pago
+      document.getElementById('closeAddPayment').addEventListener('click', function() {
+        document.getElementById('addPaymentModal').style.display = 'none';
+      });
+      
+      // Confirmar pago
+      document.getElementById('confirmPaymentBtn').addEventListener('click', function() {
+        const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+        
+        if (paymentAmount <= 0) {
+          showError(document.getElementById('paymentAmount'), 'paymentAmountError', 'Ingresa un monto válido');
+          return;
+        }
+        
+        const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+        const currentAmountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+        const newAmountPaid = currentAmountPaid + paymentAmount;
+        
+        if (newAmountPaid > orderValue) {
+          showError(document.getElementById('paymentAmount'), 'paymentAmountError', 'El pago excede el saldo pendiente');
+          return;
+        }
+        
+        document.getElementById('amountPaid').value = newAmountPaid;
+        updatePaymentProgress();
+        document.getElementById('addPaymentModal').style.display = 'none';
+        showNotification(`Pago de $${formatCurrency(paymentAmount)} registrado correctamente`, 'success');
+      });
+      
+      // Cerrar modal al hacer clic fuera
+      window.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('addPaymentModal')) {
+          document.getElementById('addPaymentModal').style.display = 'none';
+        }
+      });
+    }
+
+    // Actualizar barra de progreso de pago
+    function updatePaymentProgress() {
+      const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+      const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+      const percentage = orderValue > 0 ? Math.min(100, (amountPaid / orderValue) * 100) : 0;
+      const balance = orderValue - amountPaid;
+      
+      document.getElementById('paymentProgressBar').style.width = `${percentage}%`;
+      document.getElementById('paymentPercentage').textContent = `${percentage.toFixed(0)}%`;
+      document.getElementById('paymentBalance').textContent = `Saldo: $${formatCurrency(balance)}`;
+      
+      // Cambiar color de la barra según el porcentaje
+      const progressBar = document.getElementById('paymentProgressBar');
+      if (percentage === 0) {
+        progressBar.style.backgroundColor = '#f44336';
+      } else if (percentage < 100) {
+        progressBar.style.backgroundColor = '#ff9800';
+      } else {
+        progressBar.style.backgroundColor = '#4caf50';
+      }
+    }
 
     // Cargar órdenes desde localStorage
     function loadOrders() {
@@ -939,6 +1127,10 @@
         validateField(this, 'dueDateError', this.value >= today);
       });
       
+      document.getElementById('orderValue').addEventListener('blur', function() {
+        validateField(this, 'orderValueError', this.value > 0);
+      });
+      
       // Cerrar modal al hacer clic fuera
       window.addEventListener('click', function(e) {
         if (e.target === document.getElementById('statsModal')) {
@@ -961,6 +1153,8 @@
       const clientName = document.getElementById('clientName').value.trim();
       const taskDescription = document.getElementById('taskDescription').value.trim();
       const dueDate = document.getElementById('dueDate').value;
+      const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+      const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
       const today = new Date().toISOString().split('T')[0];
       
       // Validar nombre del cliente
@@ -987,13 +1181,33 @@
         hideError(document.getElementById('dueDate'), 'dueDateError');
       }
       
+      // Validar valor del pedido
+      if (orderValue <= 0) {
+        showError(document.getElementById('orderValue'), 'orderValueError');
+        isValid = false;
+      } else {
+        hideError(document.getElementById('orderValue'), 'orderValueError');
+      }
+      
+      // Validar que el monto pagado no sea mayor al valor total
+      if (amountPaid > orderValue) {
+        showError(document.getElementById('amountPaid'), 'amountPaidError', 'El monto pagado no puede ser mayor al valor total');
+        isValid = false;
+      } else {
+        hideError(document.getElementById('amountPaid'), 'amountPaidError');
+      }
+      
       return isValid;
     }
 
     // Mostrar error en campo
-    function showError(field, errorId) {
+    function showError(field, errorId, message = null) {
       field.classList.add('input-error');
-      document.getElementById(errorId).style.display = 'block';
+      const errorElement = document.getElementById(errorId);
+      errorElement.style.display = 'block';
+      if (message) {
+        errorElement.textContent = message;
+      }
     }
 
     // Ocultar error en campo
@@ -1137,6 +1351,10 @@
           const orderElement = document.createElement('div');
           orderElement.className = 'order-details';
           
+          const paymentPercentage = order.orderValue > 0 ? (order.amountPaid / order.orderValue) * 100 : 0;
+          const paymentStatus = paymentPercentage === 0 ? 'Pendiente' : 
+                               paymentPercentage === 100 ? 'Completado' : 'Parcial';
+          
           orderElement.innerHTML = `
             <div class="order-detail-item">
               <span class="order-detail-label">Cliente:</span>
@@ -1146,19 +1364,25 @@
               <span class="order-detail-label">Encargo:</span>
               <span>${escapeHtml(order.taskDescription)}</span>
             </div>
-            ${order.orderValue ? `
             <div class="order-detail-item">
               <span class="order-detail-label">Valor:</span>
               <span>$${formatCurrency(order.orderValue)}</span>
             </div>
-            ` : ''}
+            <div class="order-detail-item">
+              <span class="order-detail-label">Pagado:</span>
+              <span>$${formatCurrency(order.amountPaid)} (${paymentPercentage.toFixed(0)}%)</span>
+            </div>
+            <div class="order-detail-item">
+              <span class="order-detail-label">Saldo:</span>
+              <span>$${formatCurrency(order.orderValue - order.amountPaid)}</span>
+            </div>
             <div class="order-detail-item">
               <span class="order-detail-label">Prioridad:</span>
               <span>${order.priority === 'high' ? '🔴 Alta' : order.priority === 'medium' ? '🟡 Media' : '🟢 Baja'}</span>
             </div>
             <div class="order-detail-item">
-              <span class="order-detail-label">Pago:</span>
-              <span class="payment-badge ${getPaymentBadgeClass(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span>
+              <span class="order-detail-label">Estado pago:</span>
+              <span class="payment-badge ${getPaymentBadgeClass(paymentStatus)}">${paymentStatus}</span>
             </div>
           `;
           
@@ -1173,19 +1397,9 @@
     // Obtener clase CSS para el badge de pago
     function getPaymentBadgeClass(paymentStatus) {
       switch(paymentStatus) {
-        case 'pending': return 'payment-pending';
-        case 'partial': return 'payment-partial';
-        case 'complete': return 'payment-complete';
-        default: return '';
-      }
-    }
-
-    // Obtener texto para el estado de pago
-    function getPaymentStatusText(paymentStatus) {
-      switch(paymentStatus) {
-        case 'pending': return 'Pendiente';
-        case 'partial': return '50% Pagado';
-        case 'complete': return '100% Pagado';
+        case 'Pendiente': return 'payment-pending';
+        case 'Parcial': return 'payment-partial';
+        case 'Completado': return 'payment-complete';
         default: return '';
       }
     }
@@ -1195,17 +1409,17 @@
       const clientName = document.getElementById('clientName').value.trim();
       const taskDescription = document.getElementById('taskDescription').value.trim();
       const dueDate = document.getElementById('dueDate').value;
+      const orderValue = parseFloat(document.getElementById('orderValue').value) || 0;
+      const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
       const priority = document.getElementById('priority').value;
-      const paymentStatus = document.getElementById('paymentStatus').value;
-      const orderValue = document.getElementById('orderValue').value ? parseInt(document.getElementById('orderValue').value) : 0;
       
       const newOrder = {
         clientName,
         taskDescription,
         dueDate,
-        priority,
-        paymentStatus,
         orderValue,
+        amountPaid,
+        priority,
         createdAt: editingIndex === -1 ? new Date().toISOString() : orders[editingIndex].createdAt,
         updatedAt: new Date().toISOString()
       };
@@ -1225,9 +1439,11 @@
       saveOrders();
       document.getElementById('taskForm').reset();
       
-      // Restablecer la fecha a hoy
+      // Restablecer la fecha a hoy y valores por defecto
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dueDate').value = today;
+      document.getElementById('amountPaid').value = 0;
+      updatePaymentProgress();
     }
 
     // Cancelar edición
@@ -1236,9 +1452,11 @@
       document.getElementById('taskForm').reset();
       document.getElementById('cancelEditBtn').style.display = 'none';
       
-      // Restablecer la fecha a hoy
+      // Restablecer la fecha a hoy y valores por defecto
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('dueDate').value = today;
+      document.getElementById('amountPaid').value = 0;
+      updatePaymentProgress();
       
       showNotification('Edición cancelada', 'warning');
     }
@@ -1258,7 +1476,9 @@
       } else if (currentFilter === 'pending') {
         filteredOrders = filteredOrders.filter(order => order.dueDate < today);
       } else if (currentFilter === 'overdue') {
-        filteredOrders = filteredOrders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete');
+        filteredOrders = filteredOrders.filter(order => order.dueDate < today && order.amountPaid < order.orderValue);
+      } else if (currentFilter === 'unpaid') {
+        filteredOrders = filteredOrders.filter(order => order.amountPaid < order.orderValue);
       }
       
       // Aplicar búsqueda
@@ -1289,8 +1509,17 @@
       filteredOrders.forEach((order, index) => {
         const orderElement = document.createElement('div');
         orderElement.className = 'task-item';
-        if (order.dueDate < today && order.paymentStatus !== 'complete') {
+        
+        const paymentPercentage = order.orderValue > 0 ? (order.amountPaid / order.orderValue) * 100 : 0;
+        const paymentStatus = paymentPercentage === 0 ? 'Pendiente' : 
+                             paymentPercentage === 100 ? 'Completado' : 'Parcial';
+        
+        if (order.dueDate < today && paymentPercentage < 100) {
           orderElement.style.borderLeftColor = 'var(--danger)';
+        } else if (paymentPercentage === 100) {
+          orderElement.style.borderLeftColor = 'var(--success)';
+        } else if (paymentPercentage > 0) {
+          orderElement.style.borderLeftColor = 'var(--warning)';
         }
         
         orderElement.setAttribute('data-index', orders.indexOf(order));
@@ -1298,14 +1527,14 @@
         orderElement.innerHTML = `
           <div class="task-content">
             <div class="task-text"><strong>${escapeHtml(order.clientName)}</strong>: ${escapeHtml(order.taskDescription)}</div>
-            ${order.orderValue ? `<div class="task-date">Valor: $${formatCurrency(order.orderValue)}</div>` : ''}
+            <div class="task-date">Valor: $${formatCurrency(order.orderValue)} | Pagado: $${formatCurrency(order.amountPaid)}</div>
             <div class="task-date">Entrega: ${formatDisplayDate(order.dueDate)} - 
               ${order.priority === 'high' ? '🔴 Alta' : order.priority === 'medium' ? '🟡 Media' : '🟢 Baja'} Prioridad
-              ${order.dueDate < today ? ' - ⚠️ Vencido' : ''}
+              ${order.dueDate < today && paymentPercentage < 100 ? ' - ⚠️ Vencido' : ''}
             </div>
             <div class="payment-status">
-              <span>Pago:</span>
-              <span class="payment-badge ${getPaymentBadgeClass(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span>
+              <span>Estado pago:</span>
+              <span class="payment-badge ${getPaymentBadgeClass(paymentStatus)}">${paymentStatus} (${paymentPercentage.toFixed(0)}%)</span>
             </div>
           </div>
           <div class="task-actions">
@@ -1333,11 +1562,12 @@
       document.getElementById('taskDescription').value = order.taskDescription;
       document.getElementById('dueDate').value = order.dueDate;
       document.getElementById('orderValue').value = order.orderValue;
+      document.getElementById('amountPaid').value = order.amountPaid;
       document.getElementById('priority').value = order.priority;
-      document.getElementById('paymentStatus').value = order.paymentStatus;
       
       editingIndex = index;
       document.getElementById('cancelEditBtn').style.display = 'block';
+      updatePaymentProgress();
       
       // Scroll al formulario
       document.getElementById('taskForm').scrollIntoView({ behavior: 'smooth' });
@@ -1378,30 +1608,21 @@
 
     // Actualizar resumen financiero
     function updateFinancialSummary() {
-      let pendingPayment = 0;
-      let partialPayment = 0;
-      let completePayment = 0;
       let totalExpected = 0;
+      let totalReceived = 0;
       
       orders.forEach(order => {
-        if (order.orderValue) {
-          totalExpected += order.orderValue;
-          
-          if (order.paymentStatus === 'pending') {
-            pendingPayment += order.orderValue;
-          } else if (order.paymentStatus === 'partial') {
-            partialPayment += order.orderValue * 0.5;
-            pendingPayment += order.orderValue * 0.5;
-          } else if (order.paymentStatus === 'complete') {
-            completePayment += order.orderValue;
-          }
-        }
+        totalExpected += order.orderValue;
+        totalReceived += order.amountPaid;
       });
       
-      document.getElementById('pendingPayment').textContent = `$${formatCurrency(pendingPayment)}`;
-      document.getElementById('partialPayment').textContent = `$${formatCurrency(partialPayment)}`;
-      document.getElementById('completePayment').textContent = `$${formatCurrency(completePayment)}`;
+      const totalPending = totalExpected - totalReceived;
+      const percentageReceived = totalExpected > 0 ? (totalReceived / totalExpected) * 100 : 0;
+      
       document.getElementById('totalExpected').textContent = `$${formatCurrency(totalExpected)}`;
+      document.getElementById('totalReceived').textContent = `$${formatCurrency(totalReceived)}`;
+      document.getElementById('totalPending').textContent = `$${formatCurrency(totalPending)}`;
+      document.getElementById('percentageReceived').textContent = `${percentageReceived.toFixed(1)}%`;
     }
 
     // Mostrar estadísticas en modal
@@ -1413,14 +1634,14 @@
       const lowPriority = orders.filter(order => order.priority === 'low').length;
       
       const today = new Date().toISOString().split('T')[0];
-      const overdue = orders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete').length;
+      const overdue = orders.filter(order => order.dueDate < today && order.amountPaid < order.orderValue).length;
       const pending = orders.filter(order => order.dueDate < today).length;
       const completed = orders.filter(order => order.dueDate >= today).length;
       
       // Estadísticas de pago
-      const paymentPending = orders.filter(order => order.paymentStatus === 'pending').length;
-      const paymentPartial = orders.filter(order => order.paymentStatus === 'partial').length;
-      const paymentComplete = orders.filter(order => order.paymentStatus === 'complete').length;
+      const fullyPaid = orders.filter(order => order.amountPaid >= order.orderValue).length;
+      const partiallyPaid = orders.filter(order => order.amountPaid > 0 && order.amountPaid < order.orderValue).length;
+      const notPaid = orders.filter(order => order.amountPaid === 0).length;
       
       statsContent.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr; gap: 15px; margin: 20px 0;">
@@ -1441,9 +1662,9 @@
           
           <div style="background: #f0f7ff; padding: 15px; border-radius: 12px;">
             <h3 style="color: var(--secondary); margin-bottom: 10px;">Estado de Pagos</h3>
-            <p>⏰ Pendientes: <strong>${paymentPending}</strong></p>
-            <p>💰 50% Pagado: <strong>${paymentPartial}</strong></p>
-            <p>✅ 100% Pagado: <strong>${paymentComplete}</strong></p>
+            <p>⏰ Sin pagar: <strong>${notPaid}</strong></p>
+            <p>💰 Pagados parcialmente: <strong>${partiallyPaid}</strong></p>
+            <p>✅ Completamente pagados: <strong>${fullyPaid}</strong></p>
           </div>
         </div>
         
@@ -1473,10 +1694,11 @@
       
       let html = '';
       upcomingOrders.forEach(order => {
+        const paymentPercentage = order.orderValue > 0 ? (order.amountPaid / order.orderValue) * 100 : 0;
         html += `
           <div style="padding: 10px; border-bottom: 1px solid #eee;">
             <strong>${escapeHtml(order.clientName)}</strong> - ${escapeHtml(order.taskDescription)}<br>
-            <span style="font-size: 0.9em; color: #666;">Vence: ${formatDisplayDate(order.dueDate)} | Pago: ${getPaymentStatusText(order.paymentStatus)}</span>
+            <span style="font-size: 0.9em; color: #666;">Vence: ${formatDisplayDate(order.dueDate)} | Pagado: ${paymentPercentage.toFixed(0)}%</span>
           </div>
         `;
       });
@@ -1497,8 +1719,18 @@
       doc.setTextColor(100, 100, 100);
       doc.text(`Generado el: ${new Date().toLocaleDateString('es-ES')}`, 105, 22, { align: 'center' });
       
+      // Resumen financiero
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Resumen Financiero', 15, 35);
+      
+      doc.setFontSize(10);
+      doc.text(`Total esperado: $${formatCurrency(orders.reduce((sum, order) => sum + order.orderValue, 0))}`, 20, 45);
+      doc.text(`Total recibido: $${formatCurrency(orders.reduce((sum, order) => sum + order.amountPaid, 0))}`, 20, 52);
+      doc.text(`Pendiente por cobrar: $${formatCurrency(orders.reduce((sum, order) => sum + (order.orderValue - order.amountPaid), 0))}`, 20, 59);
+      
       // Contenido
-      let y = 35;
+      let y = 75;
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       
@@ -1520,16 +1752,14 @@
         // Fecha, prioridad y estado de pago
         doc.setFontSize(10);
         let detailsY = y + 7 + (description.length * 5);
-        doc.text(`Fecha de entrega: ${formatDisplayDate(order.dueDate)} | Prioridad: ${getPriorityText(order.priority)} | Pago: ${getPaymentStatusText(order.paymentStatus)}`, 15, detailsY);
         
-        // Valor si existe
-        if (order.orderValue) {
-          doc.text(`Valor: $${formatCurrency(order.orderValue)}`, 15, detailsY + 5);
-          detailsY += 5;
-        }
+        const paymentPercentage = order.orderValue > 0 ? (order.amountPaid / order.orderValue) * 100 : 0;
+        
+        doc.text(`Fecha de entrega: ${formatDisplayDate(order.dueDate)} | Prioridad: ${getPriorityText(order.priority)}`, 15, detailsY);
+        doc.text(`Valor: $${formatCurrency(order.orderValue)} | Pagado: $${formatCurrency(order.amountPaid)} (${paymentPercentage.toFixed(0)}%)`, 15, detailsY + 5);
         
         // Aumentar Y según la cantidad de líneas de descripción
-        y += 15 + (description.length * 5) + (order.orderValue ? 5 : 0);
+        y += 20 + (description.length * 5);
       });
       
       // Guardar PDF
@@ -1553,10 +1783,10 @@
     // Comprobar órdenes vencidas
     function checkOverdueOrders() {
       const today = new Date().toISOString().split('T')[0];
-      const overdueOrders = orders.filter(order => order.dueDate < today && order.paymentStatus !== 'complete');
+      const overdueOrders = orders.filter(order => order.dueDate < today && order.amountPaid < order.orderValue);
       
       if (overdueOrders.length > 0) {
-        showNotification(`Tienes ${overdueOrders.length} encargo(s) vencido(s)`, 'error');
+        showNotification(`Tienes ${overdueOrders.length} encargo(s) vencido(s) por cobrar`, 'error');
       }
     }
 
